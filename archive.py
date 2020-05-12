@@ -6,8 +6,7 @@ import asyncio
 import uvloop
 import json
 import requests
-from itertools import cycle
-import traceback
+import click
 from urllib.parse import urljoin
 from scrape_all_internal_links import PyCrawler
 
@@ -74,21 +73,20 @@ def collect_links(url, max_urls):
     return crawler.visited
 
 
-def sync_get_unavailable(url):
-    links = collect_links(url=url, max_urls=10)
+def sync_get_unavailable(url, max_urls):
+    links = collect_links(url=url, max_urls=max_urls)
     get_status = (
         (url, sync_get_json("https://archive.org/wayback/available?url=" + url))
         for url in links
     )
     for url, status in get_status:
         if isinstance(status, Exception):
-            print(f"cannot get status for {url} due to {status}")
+            click.echo(click.style(f"cannot get status for {url} due to {status}", fg="red"))
             continue
         if not status:
             UNCACHED_LINKS.add(url)
         else:
-            print(f"{url} already cached.")
-
+            click.echo((click.style(f"{url} already cached.", fg="blue")))
 
 def sync_capture():
     resp_arr = (
@@ -127,9 +125,9 @@ def process(resp_arr):
                 print(f"{url}: {archive_url}")
             except KeyError:
                 # If it can't find that key raise the error
-                print(f"{url} failed due to WaybackRuntimeError")
+                click.echo(click.style(f"{url} failed due to WaybackRuntimeError", fg="red"))
         else:
-            print(f"{url} FAILED")
+            click.secho(f"{url} FAILED", fg="red")
     return
 
 
@@ -145,9 +143,19 @@ def capture():
     process(results)
     return
 
-
-if __name__ == "__main__":
-    sync_get_unavailable("https://qaisjp.com")
+@click.command()
+@click.argument("url")
+@click.option(
+    "--max_urls",
+    default=50,
+    type=click.INT,
+    help="The max number of urls to collect. Use 0 to set it as infinite.",
+)
+def main(url, max_urls):
+    sync_get_unavailable(url, max_urls)
     print(f"Found these unarchived links: {UNCACHED_LINKS}")
     print(f"Archiving them now...")
     sync_capture()
+
+if __name__ == "__main__":
+    main()
