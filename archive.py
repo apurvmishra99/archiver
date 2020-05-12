@@ -4,6 +4,8 @@ import json
 import requests
 import click
 from urllib.parse import urljoin
+from datetime import datetime, timedelta
+from dateutil.parser import parse
 from scrape_all_internal_links import PyCrawler
 
 
@@ -68,8 +70,16 @@ def sync_get_unavailable(url, max_urls):
             continue
         if not status:
             UNCACHED_LINKS.add(url)
+            continue
+        
+        # if the capture is more than week old archive it
+        now = datetime.now()
+        t = parse(status["closest"]["timestamp"])
+        delta = timedelta(days=7)
+        if now - t > delta:
+            UNCACHED_LINKS.add(url)
         else:
-            click.echo((click.style(f"{url} already cached.", fg="blue")))
+            click.echo((click.style(f"{url} already cached recently.", fg="blue")))
 
 def sync_capture():
     resp_arr = (
