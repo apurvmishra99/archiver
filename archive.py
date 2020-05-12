@@ -153,8 +153,6 @@ def capture():
 )
 def main(url, max_urls):
     sync_get_unavailable(url, max_urls)
-    print(f"Found these unarchived links: {UNCACHED_LINKS}")
-    print(f"Archiving them now...")
     sync_capture()
 
 if __name__ == "__main__":
