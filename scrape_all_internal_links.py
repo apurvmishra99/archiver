@@ -35,18 +35,21 @@ class PyCrawler(object):
         parsed = urlparse(url)
         base = f"{parsed.scheme}://{parsed.netloc}"
         links = re.findall('''<a\s+(?:[^>]*?\s+)?href="([^"]*)"''', html)
+        clean_links = set()
         for i, link in enumerate(links):
             # join the URL if it's relative (not absolute link)
             href = urljoin(url, link)
             parsed_href = urlparse(href)
             # remove URL GET parameters, URL fragments, etc.
             href = parsed_href.scheme + "://" + parsed_href.netloc + parsed_href.path
+            if href.startswith("http:"):
+                href = href.replace("http:", "https:")
             if not PyCrawler.is_valid(href):
                 # not a valid URL
                 continue
-            links[i] = href
+            clean_links.add(href)
 
-        return set(filter(lambda x: "mailto" not in x and urlparse(x).netloc == self.domain_name, links))
+        return set(filter(lambda x: "mailto" not in x and urlparse(x).netloc == self.domain_name, clean_links))
 
     def crawl(self, url):
         for link in self.get_links(url):
