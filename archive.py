@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-import aiohttp
-import asyncio
-import uvloop
 import json
 import requests
 import click
@@ -37,19 +33,6 @@ class BlockedByRobots(WaybackRuntimeError):
 
 
 UNCACHED_LINKS = set()
-
-
-async def get(url):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            return response
-
-
-async def get_json(url):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            return await response.json()
-
 
 def sync_get(url):
     try:
@@ -96,26 +79,6 @@ def sync_capture():
     process(resp_arr)
 
 
-def find_unavailable(url):
-    uvloop.install()
-    loop = asyncio.get_event_loop()
-    links = collect_links(url=url, max_urls=10)
-    coroutines = [
-        get_json("https://archive.org/wayback/available?url=" + link) for link in links
-    ]
-    results = loop.run_until_complete(
-        asyncio.gather(*coroutines, return_exceptions=True)
-    )
-
-    for url, response in zip(links, results):
-        if not isinstance(response, Exception):
-            if not response["archived_snapshots"]:
-                UNCACHED_LINKS.add(response["url"])
-        else:
-            print(response)
-            print(f"Getting status for {url} failed")
-
-
 def process(resp_arr):
     for url, res in resp_arr:
         if not isinstance(res, Exception):
@@ -130,18 +93,6 @@ def process(resp_arr):
             click.secho(f"{url} FAILED", fg="red")
     return
 
-
-def capture():
-    uvloop.install()
-    loop = asyncio.get_event_loop()
-    coroutines = [
-        get("https://web.archive.org/save/" + link) for link in UNCACHED_LINKS
-    ]
-    results = loop.run_until_complete(
-        asyncio.gather(*coroutines, return_exceptions=True)
-    )
-    process(results)
-    return
 
 @click.command()
 @click.argument("url")
