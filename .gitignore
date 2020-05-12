@@ -5,7 +5,9 @@ __pycache__/
 
 # C extensions
 *.so
-
+*.txt
+.vscode/*
+.vscode
 # Distribution / packaging
 .Python
 build/
@@ -136,3 +138,13 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Local History for Visual Studio Code
+.history/
