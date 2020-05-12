@@ -23,9 +23,21 @@ Options:
 
   --help              Show this message and exit.
 ```
+### Example
+
+```console 
+$ python archive.py --max_urls=50 https://apurvmishra.xyz
+```
 
 ### TODO
 
-- [] Package the script
-- [] Convert to async
-- [] Add command line option to just generate the sitemap
+* [ ] Package the script
+* [ ] Convert to async
+* [ ] Add command line option to just generate the sitemap
+
+### Tested On
+
+```
+Pop!_OS 20.04 LTS
+Python v3.7.6
+```
