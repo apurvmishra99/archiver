@@ -24,7 +24,7 @@ def clean_link(link, domain):
     Otherwise returns None.
     """
     avoid = ['.exe', '.pdf', '.png', '.jpg', '.iso', '.bat', '.gz']
-    avoid_in_url = ['javascript:', 'mailto:', 'Javascript:', ]
+    avoid_in_url = ['javascript:', 'mailto:', 'Javascript:', '#']
     if link is not None:
         for a in avoid:
             if link.lower().endswith(a):
@@ -32,14 +32,14 @@ def clean_link(link, domain):
         for a in avoid_in_url:
             if a in link:
                 return None
-        if link.count('http') > 1:
-            return None
+        if link.startswith('http:') > 1:
+            return link.replace("http:", "https:")
         if not link.startswith('//'):
             if link.startswith('/') or link.startswith(domain) or not link.startswith('http'):
                 if not (link.startswith('http') or link.startswith('/')):
-                    link = '/{}'.format(link)
+                    link = f'/{link}'
                 if link.startswith('/'):
-                    link = '{}{}'.format(domain, link)
+                    link = f'{domain}{link}'
                 if '?' in link and 'asp?' not in link:
                     link = link.split('?')[0]
                 return link
@@ -106,7 +106,7 @@ async def crawl(url, verbose):
 def clean_content(content, url, verbose):
     """ Parse a webpage for links """
     soup = BeautifulSoup(content, 'html.parser')
-    domain = "{0.scheme}://{0.netloc}".format(urlsplit(url))
+    domain = f"{urlsplit(url).scheme}://{urlsplit(url).netloc}"
     for link in [h.get('href') for h in soup.find_all('a')]:
         link = clean_link(link, domain)
         if link is not None:
