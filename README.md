@@ -30,7 +30,7 @@ Options:
 ### Example
 
 ```console 
-$ python archive.py --max_urls=50 https://apurvmishra.xyz
+$ python archive.py --days=7 --max_urls=50 https://apurvmishra.xyz
 ```
 
 ### Alternative use
