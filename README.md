@@ -57,7 +57,7 @@ $ python scrape_all_internal_links.py --max_urls=50 https://apurvmishra.xyz
 
 * [ ] Package the script
 * [ ] Convert to async
-* [ ] Add command line option to just generate the sitemap
+* [X] Add command line option to just generate the sitemap
 
 ### Tested On
 
