@@ -35,15 +35,15 @@ class Archiver(object):
 
 
     def collect_links(self):
-        crawler = PyCrawler(self.url, max_num_visited=self.max_urls)
+        crawler = PyCrawler(self.start_url, max_num_visited=self.max_urls)
         crawler.start()
         return crawler.visited
 
 
     def sync_get_unavailable(self):
-        links = collect_links(url=self.url, max_urls=self.max_urls)
+        links = self.collect_links()
         get_status = (
-            (url, sync_get_json(self.AVAILABLE_ENDPOINT + url))
+            (url, self.sync_get_json(self.AVAILABLE_ENDPOINT + url))
             for url in links
         )
         for url, status in get_status:
@@ -53,7 +53,7 @@ class Archiver(object):
                 )
                 continue
             if not status:
-                UNCACHED_LINKS.add(url)
+                self.UNCACHED_LINKS.add(url)
                 continue
 
             # if the capture is more than {self.days} old archive it again
@@ -61,17 +61,17 @@ class Archiver(object):
             t = parse(status["closest"]["timestamp"])
             delta = timedelta(days=self.days)
             if now - t > delta:
-                UNCACHED_LINKS.add(url)
+                self.UNCACHED_LINKS.add(url)
             else:
                 click.echo((click.style(f"{url} already cached recently.", fg="blue")))
 
 
     def sync_capture(self):
         resp_arr = (
-            (link, sync_get(self.SAVE_ENDPOINT + link))
-            for link in UNCACHED_LINKS
+            (link, self.sync_get(self.SAVE_ENDPOINT + link))
+            for link in self.UNCACHED_LINKS
         )
-        process(resp_arr)
+        self.process(resp_arr)
 
 
     def process(self, resp_arr):

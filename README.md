@@ -1,6 +1,8 @@
 # Archive
 
-A simple python script to generate a sitemap of a given website and archive all the pages not already stored in the wayback machine.
+A simple python script to generate a sitemap of a given website and archive all the pages not already stored in the wayback machine. This now available to use an API as well!
+
+Check it out the documentation [here](https://archive-it.herokuapp.com/docs/)
 
 ### Setup
 

@@ -42,7 +42,7 @@ def generate_sitemap(request: Request, url: str, limit: int = 50):
 def save_in_archive(request: Request, url:str, limit: int = 50, days: int = 7):
     url = convert_to_valid_url(url)
     archiver = Archiver(url=url, max_urls=limit, days=days)
-    archiver.sync_get_unavailable(url, limit, days)
+    archiver.sync_get_unavailable()
     archiver.sync_capture()
     archive_urls = archiver.archive_urls
     return {"Archived URLS": archive_urls}
