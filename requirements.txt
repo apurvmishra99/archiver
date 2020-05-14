@@ -5,6 +5,7 @@ bs4==0.0.1
 certifi==2020.4.5.1
 chardet==3.0.4
 click==7.1.2
+fastapi==0.54.1
 idna==2.9
 multidict==4.7.5
 pathspec==0.8.0
@@ -15,4 +16,6 @@ six==1.14.0
 soupsieve==2.0
 toml==0.10.0
 typed-ast==1.4.1
-urllib3==1.25.9(yarl==1.4.2
+urllib3==1.25.9
+yarl==1.4.2
+slowapi==0.1.1

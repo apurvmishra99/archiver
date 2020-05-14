@@ -1,10 +1,11 @@
-#!venv/bin/python3
+#! /usr/bin/env python3
 
 import click
 import requests
 import re
-from urllib.parse import urlparse, urljoin
 import os
+from urllib.parse import urlparse, urljoin
+import archiver.utils 
 
 class PyCrawler(object):
     def __init__(self, starting_url, max_num_visited=50):
@@ -13,14 +14,6 @@ class PyCrawler(object):
         self.visited = set()
         self.max_num_visited = max_num_visited
         self.num_visited = 0
-        
-    @staticmethod    
-    def is_valid(url):
-        """
-        Checks whether `url` is a valid URL.
-        """
-        parsed = urlparse(url)
-        return bool(parsed.netloc) and bool(parsed.scheme)
 
     def get_html(self, url):
         try:
@@ -33,7 +26,6 @@ class PyCrawler(object):
     def get_links(self, url):
         html = self.get_html(url)
         parsed = urlparse(url)
-        base = f"{parsed.scheme}://{parsed.netloc}"
         links = re.findall('''<a\s+(?:[^>]*?\s+)?href="([^"]*)"''', html)
         clean_links = set()
         for i, link in enumerate(links):
@@ -44,13 +36,15 @@ class PyCrawler(object):
             href = parsed_href.scheme + "://" + parsed_href.netloc + parsed_href.path
             if href.startswith("http:"):
                 href = href.replace("http:", "https:")
-            if not PyCrawler.is_valid(href):
+            if not archiver.utils.is_valid(href):
                 # not a valid URL
                 continue
+            if not archiver.utils.is_link_clean(href, self.domain_name):
+                continue
             clean_links.add(href)
+        return clean_links
 
-        return set(filter(lambda x: "mailto" not in x and urlparse(x).netloc == self.domain_name, clean_links))
-
+        
     def crawl(self, url):
         for link in self.get_links(url):
             if self.num_visited >= self.max_num_visited:
@@ -76,10 +70,7 @@ class PyCrawler(object):
 def main(url, max_urls):
     crawler = PyCrawler(url, max_num_visited=max_urls)
     crawler.start()
-    domain_name = urlparse(url).netloc
-    with open(f"{domain_name}_internal_links.txt", "w") as f:
-        for internal_link in crawler.visited:
-            print(internal_link.strip(), file=f)
+    archiver.utils.write_output(url, crawler.visited)
 
 if __name__ == "__main__":
     main()
