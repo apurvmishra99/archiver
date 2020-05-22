@@ -23,7 +23,7 @@ def write_output(url: str, visited: set):
     domain_name = urlparse(url).netloc
     if not os.path.exists("outputs"):
         os.makedirs("outputs")
-    with open(f"outputs/{domain_name}_internal_links.txt", "w") as f:
+    with open(f"outputs/{domain_name}_internal_links.txt", "w+") as f:
         for internal_link in visited:
             print(internal_link.strip(), file=f)
 
@@ -48,8 +48,6 @@ def is_link_clean(href: str, domain: str):
         if href.lower().startswith(st):
             return False
     if urlparse(href).netloc != domain:
-        return False
-    if href == "/":
         return False
     return True
 

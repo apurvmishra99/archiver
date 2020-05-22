@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address, Request
 from slowapi.errors import RateLimitExceeded
-from archiver.scrape_all_internal_links import PyCrawler
+from archiver.scrape_all_internal_links import AsyncCrawler
 from archiver.archive import Archiver
 from archiver.utils import convert_to_valid_url
 
@@ -32,7 +32,7 @@ def root():
 @limiter.limit("5/minute")
 def generate_sitemap(request: Request, url: str, limit: int = 50):
     url = convert_to_valid_url(url)
-    crawler = PyCrawler(url, limit)
+    crawler = AsyncCrawler(url, limit)
     crawler.start()
     result = crawler.visited
     return {"Internal Urls": result}    
