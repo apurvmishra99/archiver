@@ -1,5 +1,5 @@
 import os
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urlparse
 
 TO_IGNORE_EXT = {
     ".exe",
