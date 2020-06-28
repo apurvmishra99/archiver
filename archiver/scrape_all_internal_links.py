@@ -3,7 +3,6 @@
 import click
 import requests
 import re
-import os
 from urllib.parse import urlparse, urljoin
 import archiver.utils 
 
